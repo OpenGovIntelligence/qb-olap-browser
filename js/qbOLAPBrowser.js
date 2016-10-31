@@ -1,8 +1,7 @@
-
 //On load page show available data cubes
 $(function(){
 	   $.ajax({
-	        url: 'http://localhost:8080/JSON-QB-REST-API/cubes',                        
+	        url: prop.jsonqbAPIuri+'cubes',                        
 	        headers: {
 	 	       'Accept': 'application/json', 
 		       'Accept-Language': 'en'
@@ -40,7 +39,7 @@ function loadCubeStructure(rowIndex,columnIndex){
     //Clean current divs
     $("#rowsCols").empty();
     $("#filter").empty();
-    $("#measures").empty();  
+    
     $("#button").empty(); 
     $("#tableview").empty();
     
@@ -56,8 +55,9 @@ function loadCubeStructure(rowIndex,columnIndex){
  	 		"<img id='filterLoad' width='25px' src='images/loadingdots.gif' />" +
  	 		"</legend></fieldSet></form>"); 
     
+    //Load measures
     $.ajax({
-        url: 'http://localhost:8080/JSON-QB-REST-API/measures',  
+        url: prop.jsonqbAPIuri+'measures',  
         data : {        	
         	dataset : encodeURI(dataSetURI)			
 		},
@@ -67,7 +67,7 @@ function loadCubeStructure(rowIndex,columnIndex){
 	    },
         success: function(responseJsonMeasure){          	
         	$("#filterField").append("<div id='filtermeasure'></div>");
-        	  $("#filtermeasure").append("Measure: ");
+        	$("#filtermeasure").append("Measure: ");
         	  d3.select("#filtermeasure")
         	  .append("select")
         	  .attr("id", "selectMeasure")
@@ -76,14 +76,13 @@ function loadCubeStructure(rowIndex,columnIndex){
     	      .enter().append("option")
     	      .text(function (d) {return d.labels[0].label;})
     	      .attr("value", function (d) { return d.URI; });     	
-        },
-	    
+        },	    
     });
         
     
     //Load dimensions and their values
     $.ajax({
-        url: 'http://localhost:8080/JSON-QB-REST-API/dimensions',  
+        url: prop.jsonqbAPIuri+'dimensions',  
         data : {        	
         	dataset : encodeURI(dataSetURI)			
 		},
@@ -141,8 +140,7 @@ function loadCubeStructure(rowIndex,columnIndex){
         	//Set selected column
         	$("#selectColumn").val(dimensionsResponseJson[columnIndex].URI);
         	
-                        	
-        	//The rest         	
+         	//The rest         	
         	if(dimensionsResponseJson.length>2){
         	      		
         		//count the successful callbacks
@@ -152,7 +150,7 @@ function loadCubeStructure(rowIndex,columnIndex){
 	        		if(i!=rowIndex&&i!=columnIndex){	
 	        			 $("#filterField").append("<div id='filterdims' class='filterDiv'></div>");
 		        		$.ajax({
-		        	        url: 'http://localhost:8080/JSON-QB-REST-API/dimension-values',  
+		        	        url: prop.jsonqbAPIuri+'dimension-values',  
 		        	        data : {        	
 		        	        	dataset : encodeURI(dataSetURI),
 		        	        	dimension: encodeURI(dimensionsResponseJson[i].URI)
@@ -183,30 +181,12 @@ function loadCubeStructure(rowIndex,columnIndex){
 		        	    });	 
 	        		}
 	        	}
-        	}
-        	
-      
-        }
-        
+        	}      
+        }        
     });
-    
-   
-    
-    
-   
-	 
-   	    
+      	    
     $("#button").append("<form><input type=\"button\" value=\"Show table\" " +
-    		"id=\"showTable\" onclick=\"loadTable()\" class='button'/></form>");
-  
-   // var selectedIndex = d3.event.target.selectedIndex;
-   // if you need to access more complicated attributes 
-   // or data from the option element, you can use the index
-   // to select the individual element:
-   // var selectedDOMElement =
-   //    d3.event.target.children[selectedIndex];
-   // var selection = d3.select(selectedDOMElement);    
-   //alert("The text from that option was: " + selection.text());
+    		"id=\"showTable\" onclick=\"loadTable()\" class='button'/></form>");   
 	
 }
 
@@ -227,18 +207,8 @@ function loadTable(){
 	dataValues['dataset']= encodeURI($('#cubeURI').val()),
 	dataValues['measure']= encodeURI($('#selectMeasure').val());
 	$.ajax({
-		url : 'http://localhost:8080/JSON-QB-REST-API/table',
+		url : prop.jsonqbAPIuri+'table',
 		data :dataValues,
-	//	{
-			
-			//dataset : encodeURI("http://id.vlaanderen.be/statistieken/dq/wonen-sociale-huisvesting-kubus#id"),
-//			dataset : encodeURI($('#cubeURI').val()),			
-//			"http://id.vlaanderen.be/statistieken/def#refArea":encodeURI("http://id.fedstats.be/nis/11001#id"),
-//			col:encodeURI($('#selectColumn').val()),
-//			row:encodeURI($('#selectRow').val()),
-			//col:encodeURI("http://id.vlaanderen.be/statistieken/def#timePeriod"),
-			//row:encodeURI("http://id.vlaanderen.be/statistieken/def#verhuringentype")
-//		}
 	
 		headers: {
 	       'Accept': 'application/json', 
@@ -266,78 +236,3 @@ function loadTable(){
 	    }  	
 	});
 }
-
-
-
-
-
-
-/*$(document).ready(function() {
-	$('#dataset').blur(function() {
-		$.ajax({
-			url : 'http://localhost:8080/JSON-QB-REST-API/table',
-			data : {
-		//		dataset : encodeURI($('#dataset').val()),
-		//		dimension : encodeURI($('#dimension').val()),
-				//			"http://purl.org/linked-data/sdmx/2009/dimension#sex":encodeURI("http://purl.org/linked-data/sdmx/2009/code#sex-F")
-//				dataset : encodeURI("http://id.vlaanderen.be/statistieken/dq/kubus-arbeidsmarkt-swse#id"),
-				
-				//WORKING---
-				dataset : encodeURI("http://id.vlaanderen.be/statistieken/dq/wonen-sociale-huisvesting-kubus#id"),
-				"http://id.vlaanderen.be/statistieken/def#refArea":encodeURI("http://id.fedstats.be/nis/11001#id"),
-				col:encodeURI("http://id.vlaanderen.be/statistieken/def#timePeriod"),
-				row:encodeURI("http://id.vlaanderen.be/statistieken/def#verhuringentype")
-			//END WORKING
-				
-			//	dataset : encodeURI("http://id.vlaanderen.be/statistieken/dq/kubus-gemiddelde-prijs#id"),
-			//	"http://id.vlaanderen.be/statistieken/def#refArea":encodeURI("http://id.fedstats.be/nis/11001#id"),
-			//	col:encodeURI("http://id.vlaanderen.be/statistieken/def#timePeriod"),
-			//	row:encodeURI("http://id.vlaanderen.be/statistieken/def#vastgoedtype")
-
-			},
-			headers: {
-		       'Accept': 'application/json', 
-		       'Accept-Language': 'en'
-		    },
-			success : function(responseJson) {          // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response JSON...
-				//debugger;			
-				
-				JSONstatUtils.tbrowser(
-						  JSONstat( responseJson ),
-						  document.getElementById("tableview1"),
-						  {
-						    preset: "bigger"
-						  }
-						);
-				
-			//	var html=JSONstatUtils.datalist(JSONstat(responseJson) )
-			//	$("#tableview1").append(html);
-				  $("#tableview2").append($("<p>").text(JSON.stringify(responseJson)));
-				//	$("#tableview").append($("<p>").text(JSON.stringify(responseJson)));
-			//	d3.select("#tableview").selectAll("p")
-			 //   .data(responseJson)
-			  //  .enter()
-			   // .append("p")
-			   // .text(function (d) {return JSON.stringify(d);});
-				
-				
-				
-				
-			//	$("#tableview").append($("<p>").text(JSON.stringify(responseJson)));
-				//(JSON.stringify(responseJson)).apendTo($("#ajaxGetUserServletResponse"));
-				//var jsonStr = JSON.stringify(jsonVar);
-		//		    var $table = $("<table>").appendTo($("#ajaxGetUserServletResponse")); // Create HTML <table> element and append it to HTML DOM element with ID "somediv".
-		 //     $.each(responseJson, function(index, cube) {    // Iterate over the JSON array.
-		  //    	debugger;
-		   //     	$("<tr>").appendTo($table)                     // Create HTML <tr> element, set its text content with currently iterated item and append it to the <table>.
-		    //       //  .append($("<td>").text(tp));    
-		     //       .append($("<td>").text(cube.URI))
-		      //      .append($("<td>").text(cube.labels[0].label));        // Create HTML <td> element, set its text content with id of currently iterated product and append it to the <tr>.
-		                
-		       // });
-		    }
-		});
-	});
-});*/
-
-
