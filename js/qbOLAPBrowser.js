@@ -80,6 +80,7 @@ function loadCubeStructure(rowIndex,columnIndex){
     });
         
     
+    
     //Load dimensions and their values
     $.ajax({
         url: prop.jsonqbAPIuri+'dimensions',  
