@@ -1,32 +1,37 @@
 //On load page show available data cubes
 $(function(){
 	   $.ajax({
-	        url: prop.jsonqbAPIuri+'cubes',                        
+	        url: prop.jsonqbAPIuri+'aggregationSetcubes',                        
 	        headers: {
 	 	       'Accept': 'application/json', 
 		       'Accept-Language': 'en'
 		    },
-	        success: function(responseJson){  
-	        	
-	        	 $("#datasets").append(
-	        	 		"<form>" +
-	        	 		"<fieldSet id='datasetField'>" +
-	        	 		"<legend>Select dataset</legend>"); 
-        	
-	        	  d3.select("#datasetField")
-	        	      .append("select")
-	        	      .attr("id", "cubeURI")
-	        	      .on("change", function(){loadCubeStructure(0,1)})
-	        	      .selectAll("option")
-	        	      .data(responseJson)
-	        	      .enter().append("option")
-	        	      .text(function (d) {return d.labels[0].label;})
-	        	      .attr("value", function (d) { return d.URI; });
-	        	  
-	        	  $("#datasets").append("</fieldSet></form>");
-	        }
+	        success: function(responseJson){
+	        	loadAvailableCubes (responseJson);
+	        }	        
 	    });
 });
+
+
+function loadAvailableCubes (responseJson){  
+	
+	 $("#datasets").append(
+	 		"<form>" +
+	 		"<fieldSet id='datasetField'>" +
+	 		"<legend>Select dataset</legend>"); 
+
+	  d3.select("#datasetField")
+	      .append("select")
+	      .attr("id", "cubeURI")
+	      .on("change", function(){loadCubeStructure(0,1)})
+	      .selectAll("option")
+	      .data(responseJson)
+	      .enter().append("option")
+	      .text(function (d) {return d.labels[0].label;})
+	      .attr("value", function (d) { return d.URI; });
+	  
+	  $("#datasets").append("</fieldSet></form>");
+}
 
 //Load cube structure when Data Cube is selected
 //Input: rowIndex-> the index of dimension to be used for rows
@@ -77,8 +82,7 @@ function loadCubeStructure(rowIndex,columnIndex){
     	      .text(function (d) {return d.labels[0].label;})
     	      .attr("value", function (d) { return d.URI; });     	
         },	    
-    });
-        
+    });        
     
     
     //Load dimensions and their values
@@ -147,10 +151,11 @@ function loadCubeStructure(rowIndex,columnIndex){
         		//count the successful callbacks
         		var j=2;
         		
-	        	for (i = 0; i < dimensionsResponseJson.length; i++) { 
+	        	for (var i = 0; i < dimensionsResponseJson.length; i++) { 
+	        		//If the dimensions is not the row and column of the table, then it is for filter
 	        		if(i!=rowIndex&&i!=columnIndex){	
 	        			 $("#filterField").append("<div id='filterdims' class='filterDiv'></div>");
-		        		$.ajax({
+	        			 $.ajax({
 		        	        url: prop.jsonqbAPIuri+'dimension-values',  
 		        	        data : {        	
 		        	        	dataset : encodeURI(dataSetURI),
@@ -162,6 +167,7 @@ function loadCubeStructure(rowIndex,columnIndex){
 		        		    },
 		        	        success: function(dimValuesJson){  
 		        	        	j++;
+		        	        	
 		        	        	$("#filterdims").append(dimValuesJson.dimension.labels[0].label+": ");
 	           	        	    d3.select("#filterdims")
 		        	        	  .append("select")
