@@ -1,7 +1,8 @@
 //On load page show available data cubes
 $(function(){
 	   $.ajax({
-	        url: prop.jsonqbAPIuri+'aggregationSetcubes',                        
+	        url: prop.jsonqbAPIuri+'aggregationSetcubes',
+		     //url: prop.jsonqbAPIuri+'cubes',
 	        headers: {
 	 	       'Accept': 'application/json', 
 		       'Accept-Language': 'en'
@@ -25,10 +26,10 @@ function loadAvailableCubes (responseJson){
 	      .attr("id", "cubeURI")
 	      .on("change", function(){loadCubeStructure(0,1)})
 	      .selectAll("option")
-	      .data(responseJson)
+	      .data(responseJson.cubes)
 	      .enter().append("option")
-	      .text(function (d) {return d.labels[0].label;})
-	      .attr("value", function (d) { return d.URI; });
+	      .text(function (d) {return d['label'];})
+	      .attr("value", function (d) { return d['@id']; });
 	  
 	  $("#datasets").append("</fieldSet></form>");
 }
@@ -77,10 +78,10 @@ function loadCubeStructure(rowIndex,columnIndex){
         	  .append("select")
         	  .attr("id", "selectMeasure")
     	      .selectAll("option")
-    	      .data(responseJsonMeasure)
+    	      .data(responseJsonMeasure.measures)
     	      .enter().append("option")
-    	      .text(function (d) {return d.labels[0].label;})
-    	      .attr("value", function (d) { return d.URI; });     	
+    	      .text(function (d) {return d['label'];})
+    	      .attr("value", function (d) { return d['@id']; });     	
         },	    
     });        
     
@@ -113,13 +114,13 @@ function loadCubeStructure(rowIndex,columnIndex){
         		  }
         		  loadCubeStructure($('#selectRow').prop('selectedIndex'),columnIndex)})
     	      .selectAll("option")
-    	      .data(dimensionsResponseJson)
+    	      .data(dimensionsResponseJson.dimensions)
     	      .enter().append("option")
-    	      .text(function (d) {return d.labels[0].label;})
-    	      .attr("value", function (d) { return d.URI; });  
+    	      .text(function (d) {return d['label'];})
+    	      .attr("value", function (d) { return d['@id']; });  
         	
         	//set selected row
-        	$("#selectRow").val(dimensionsResponseJson[rowIndex].URI);
+        	$("#selectRow").val(dimensionsResponseJson.dimensions[rowIndex]['@id']);
         	  
         	$("#visualDimsField").append(" Column: ");
         	  
@@ -137,21 +138,21 @@ function loadCubeStructure(rowIndex,columnIndex){
         		  }
         		  loadCubeStructure(rowIndex,$('#selectColumn').prop('selectedIndex'))})
     	      .selectAll("option")
-    	      .data(dimensionsResponseJson)
+    	      .data(dimensionsResponseJson.dimensions)
     	      .enter().append("option")
-    	      .text(function (d) {return d.labels[0].label;})
-    	      .attr("value", function (d) { return d.URI; });   
+    	      .text(function (d) {return d['label'];})
+    	      .attr("value", function (d) { return d['@id']; });   
         	
         	//Set selected column
-        	$("#selectColumn").val(dimensionsResponseJson[columnIndex].URI);
+        	$("#selectColumn").val(dimensionsResponseJson.dimensions[columnIndex]['@id']);
         	
          	//The rest         	
-        	if(dimensionsResponseJson.length>2){
+        	if(dimensionsResponseJson.dimensions.length>2){
         	      		
         		//count the successful callbacks
         		var j=2;
         		
-	        	for (var i = 0; i < dimensionsResponseJson.length; i++) { 
+	        	for (var i = 0; i < dimensionsResponseJson.dimensions.length; i++) { 
 	        		//If the dimensions is not the row and column of the table, then it is for filter
 	        		if(i!=rowIndex&&i!=columnIndex){	
 	        			 $("#filterField").append("<div id='filterdims' class='filterDiv'></div>");
@@ -159,7 +160,7 @@ function loadCubeStructure(rowIndex,columnIndex){
 		        	        url: prop.jsonqbAPIuri+'dimension-values',  
 		        	        data : {        	
 		        	        	dataset : encodeURI(dataSetURI),
-		        	        	dimension: encodeURI(dimensionsResponseJson[i].URI)
+		        	        	dimension: encodeURI(dimensionsResponseJson.dimensions[i]['@id'])
 		        			},
 		        	        headers: {
 		        	 	       'Accept': 'application/json', 
@@ -168,28 +169,27 @@ function loadCubeStructure(rowIndex,columnIndex){
 		        	        success: function(dimValuesJson){  
 		        	        	j++;
 		        	        	
-		        	        	$("#filterdims").append(dimValuesJson.dimension.labels[0].label+": ");
+		        	        	$("#filterdims").append(dimValuesJson.dimension.label+": ");
 	           	        	    d3.select("#filterdims")
 		        	        	  .append("select")
-		        	        	  .attr("id", dimValuesJson.dimension.URI)
+		        	        	  .attr("id", dimValuesJson.dimension['@id'])
 		        	        	  .attr("class", "filter")
 		        	    	      .selectAll("option")
 		        	    	      .data(dimValuesJson.values)
 		        	    	      .enter().append("option")
-		        	    	      .text(function (d) {return d.labels[0].label;})
-		        	    	      .attr("value", function (d) { return d.URI; });     	
-		        	       },
-		        	       complete: function(){
-		        	    	   //when all callbacks are finished hide loading icon
-		        	    	   if(j==(dimensionsResponseJson.length)){
-		        	    		   $('#filterLoad').hide();
-		        	    	   }
-		        	       }  	      
+		        	    	      .text(function (d) {return d['label'];})
+		        	    	      .attr("value", function (d) { return d['@id']; });     	
+		        	       }	      
 		        	    });	 
 	        		}
 	        	}
         	}      
         }        
+    });
+    
+    //hide loading button when all ajax calls are done
+    $(document).ajaxStop(function () {
+    	$('#filterLoad').hide();	
     });
       	    
     $("#button").append("<form><input type=\"button\" value=\"Show table\" " +
@@ -214,7 +214,8 @@ function loadTable(){
 	dataValues['dataset']= encodeURI($('#cubeURI').val()),
 	dataValues['measure']= encodeURI($('#selectMeasure').val());
 	$.ajax({
-		url : prop.jsonqbAPIuri+'table',
+		url : prop.jsonqbAPIuri+'jsonstat-table',
+		//url : prop.jsonqbAPIuri+'table',
 		data :dataValues,
 	
 		headers: {
