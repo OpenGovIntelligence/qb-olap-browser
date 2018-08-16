@@ -39,6 +39,11 @@ function loadAvailableCubes(responseJson) {
 			return d[ARJK['id']];
 		});
 
+	$('#cubeURI').append($('<option selected disabled>', {
+		value: 1,
+		text: ''
+	}));
+
 	$("#datasets").append("</fieldSet></form>");
 }
 
@@ -69,7 +74,7 @@ function loadCubeStructure(rowIndex, columnIndex) {
 		"<img id='filterLoad' width='25px' src='images/loadingdots.gif' />" +
 		"</legend></fieldSet></form>");
 
-	getMeasures(encodeURI(dataSetURI))
+	getMeasures(encodeURIComponent(dataSetURI))
 		.then(function(responseJsonMeasure) {
 			_measures = responseJsonMeasure;
 			$("#filterField").append("<div id='filtermeasure'></div>");
@@ -88,7 +93,7 @@ function loadCubeStructure(rowIndex, columnIndex) {
 				});
 		});
 
-	getDimensions(encodeURI(dataSetURI))
+	getDimensions(encodeURIComponent(dataSetURI))
 		.then(
 			function(dimensionsResponseJson) {
 				_dimensions = dimensionsResponseJson;
@@ -156,7 +161,7 @@ function loadCubeStructure(rowIndex, columnIndex) {
 
 					//count the successful callbacks
 					var j = 2;
-					getObservations(encodeURI(dataSetURI)).then(observations => {
+					getObservations(encodeURIComponent(dataSetURI)).then(observations => {
 						_rawObs = observations.result;
 						_dimensionsValues = getDimensionValues(observations, _dimensions);
 						dimenValues = _dimensionsValues;
