@@ -8,28 +8,29 @@
 }
 
 .selection {
-	width: 100%;		
+	width: 100%;
 }
 
 .selection fieldset {
 	padding: 5px;
 	margin-bottom: 3px;
+	border-color: #1f4a86;
 }
 
 .selection form{
 	padding: 2px;
 	text-align: left;
-	color: #fff;
-	background-color: #777;
+	color: #000;
+	background-color: #c3d9ef;
 	white-space: nowrap;
 }
 
 .selection legend {
-	color: #fff;
+	color: #000;
 }
 
-.button {	
-    background-color: #e44690;
+.button {
+    background-color: #1f4a86;
     border: none;
     color: white;
     padding: 7px 32px;
@@ -43,14 +44,14 @@
 
 .tbrowser {
 	width: 100%;
-	border: 1px solid #ccc;
+	border: 1px solid #1f4a86;
 	/*background-color: #fff;*/
 }
 .tbrowser caption, .tbrowser tfoot td {
 	text-align: left;
 	/*color: #fff;*/
-	background-color: #ccc;
-	font-weight: bold;
+	background-color: #c3d9ef;
+	font-weight: normal;
 }
 .tbrowser legend {
 /*	color: #fff;*/
@@ -87,14 +88,14 @@
 }
 .tbrowser th {
 	text-align: left;
-	background-color: #ccc;
+	background-color: #c3d9ef;
 }
 .tbrowser thead th {
 	text-align: center;
 }
 .tbrowser td {
 	text-align: right;
-	background-color: #eee;
+	background-color: #eaf3fc;
 }
 .tbrowser fieldset {
 	padding: 5px;
