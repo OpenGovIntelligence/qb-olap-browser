@@ -1,3 +1,3 @@
 prop = {
-  jsonqbAPIuri:'http://localhost:8080/'
+  jsonqbAPIuri:'http://losd.staging.derilinx.com:8082/'
 }
